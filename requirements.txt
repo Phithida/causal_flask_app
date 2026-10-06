@@ -1,0 +1,6 @@
+flask>=3.0
+torch>=2.0
+transformers>=4.40
+pythainlp>=4.0
+emoji>=2.0
+thaixtransformers

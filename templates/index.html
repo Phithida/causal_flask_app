@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIT13_ระบบวิเคราะห์ความสัมพันธ์เชิงเหตุและผลจากรีวิวที่พักในจังหวัดขอนแก่น</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <h2>เว็บไซต์ทดสอบแบบจำลองเพื่อวิเคราะห์ความสัมพันธ์เชิงเหตุและผล (Causal Analysis) จากรีวิวที่พักในจังหวัดขอนแก่น</h2>
+    <p class="lede">กรอกข้อความรีวิวที่ต้องการทดสอบความสัมพันธ์เชิงเหตุและผล</p>
+  </header>
+
+  <main>
+    <form method="POST" class="input-panel">
+      <label for="review_text">ข้อความรีวิว</label>
+      <textarea id="review_text" name="review_text" rows="4"
+        placeholder="เช่น พนักงานบริการดีมาก ทำให้รู้สึกประทับใจ หรือ แอร์ไม่เย็น เพราะไม่ได้ล้างแอร์">{{ input_text }}</textarea>
+      <button type="submit">วิเคราะห์ข้อความ</button>
+    </form>
+
+    {% if result %}
+      {% if result.error %}
+        <div class="panel error-panel">
+          <p>{{ result.error }}</p>
+        </div>
+      {% else %}
+        <section class="results">
+          <div class="results-head">
+            <span class="results-label">ผลการวิเคราะห์</span>
+            <span class="results-count">{{ result.results|length }} รายการ</span>
+          </div>
+
+          <div class="reading-grid">
+            {% for item in result.results %}
+              <article class="reading-card causal-card">
+                <div class="reading-top">
+                  <span class="aspect-name">สถานะ: {{ item.label }}</span>
+                  <span class="sentiment-badge causal-badge">{{ item.marker }}</span>
+                </div>
+                
+                <div class="causal-block">
+                  <div class="causal-item cause">
+                    <strong>สาเหตุ (Cause):</strong>
+                    <p>{{ item.cause }}</p>
+                  </div>
+                  <div class="causal-item effect">
+                    <strong>ผลลัพธ์ (Effect):</strong>
+                    <p>{{ item.effect }}</p>
+                  </div>
+                </div>
+
+                <div class="confidence-row">
+                  <div class="confidence-track">
+                    <div class="confidence-fill" style="width: {{ (item.confidence * 100)|round|int }}%"></div>
+                  </div>
+                  <span class="confidence-value">{{ (item.confidence * 100)|round|int }}%</span>
+                </div>
+                {% if item.low_confidence %}
+                  <p class="review-flag">⚠ ความมั่นใจต่ำ — ควรตรวจสอบอีกครั้ง</p>
+                {% endif %}
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+  </main>
+</div>
+
+</body>
+</html>
